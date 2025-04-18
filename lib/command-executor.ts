@@ -3,6 +3,10 @@ import { systemCommands } from "./system-commands"
 import { fileSystemCommands } from "./file-system-commands"
 import { helpCommands } from "./help-commands"
 import { kernelCommands } from "./kernel-commands"
+import { packageCommands } from "./package-commands"
+import { userCommands } from "./user-commands"
+import { processCommands } from "./process-commands"
+import { utilityCommands } from "./utility-commands"
 
 // Virtual file system structure
 export const fileSystem = {
@@ -17,19 +21,47 @@ export const fileSystem = {
         },
         downloads: {},
         pictures: {},
+        ".bashrc":
+          "# ~/.bashrc: executed by bash(1) for non-login shells.\n# see /usr/share/doc/bash/examples/startup-files for examples",
+        ".bash_history": "ls\ncd documents\ncat readme.txt\nifconfig\nuname -a",
       },
     },
     bin: {},
+    sbin: {},
     etc: {
-      hosts: "127.0.0.1 localhost\n::1 localhost",
+      hosts: "127.0.0.1 localhost\n::1 localhost ip6-localhost ip6-loopback\n127.0.1.1 debian-bitos",
       "resolv.conf": "nameserver 8.8.8.8\nnameserver 8.8.4.4",
       "sysctl.conf": "# System configuration file\nnet.ipv4.ip_forward=1\nkernel.sysrq=1",
+      apt: {
+        "sources.list":
+          "deb http://deb.debian.org/debian bookworm main\ndeb http://security.debian.org/debian-security bookworm-security main\ndeb http://deb.debian.org/debian bookworm-updates main",
+      },
+      passwd:
+        "root:x:0:0:root:/root:/bin/bash\ndaemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin\nbin:x:2:2:bin:/bin:/usr/sbin/nologin\nsys:x:3:3:sys:/dev:/usr/sbin/nologin\nuser:x:1000:1000:User,,,:/home/user:/bin/bash",
+      group: "root:x:0:\ndaemon:x:1:\nbin:x:2:\nsys:x:3:\nadm:x:4:user\nsudo:x:27:user\nuser:x:1000:",
+      shadow:
+        "root:!:19462:0:99999:7:::\ndaemon:*:19462:0:99999:7:::\nbin:*:19462:0:99999:7:::\nsys:*:19462:0:99999:7:::\nuser:$6$xyz:19462:0:99999:7:::",
     },
     var: {
       log: {
-        "system.log": "System started successfully.\nAll services running normally.",
-        "dmesg.log":
-          "[    0.000000] Linux version 5.15.0-bitos (user@bitos) (gcc version 11.2.0) #1 SMP PREEMPT\n[    0.100000] Command line: BOOT_IMAGE=/boot/vmlinuz-5.15.0-bitos root=UUID=1234-5678\n[    0.200000] BIOS-provided physical RAM map\n[    0.300000] Kernel command line: BOOT_IMAGE=/boot/vmlinuz-5.15.0-bitos root=UUID=1234-5678\n[    0.400000] Initializing cgroup subsys cpuset\n[    0.500000] Initializing cgroup subsys cpu\n[    0.600000] NR_IRQS:16640 nr_irqs:552 16\n[    0.700000] Console: colour VGA+ 80x25\n[    0.800000] console [tty0] enabled\n[    0.900000] Detected 2.4 GHz processor.\n[    1.000000] Booting paravirtualized kernel on bare hardware\n[    1.100000] Initialized network device eth0\n[    1.200000] Initialized network device wlan0\n[    1.300000] Mounted root filesystem\n[    1.400000] BitOS initialization complete",
+        syslog:
+          "Apr 18 12:00:01 debian-bitos systemd[1]: Started System Logging Service.\nApr 18 12:00:05 debian-bitos kernel: [    0.000000] Linux version 5.15.0-bitos\nApr 18 12:01:23 debian-bitos NetworkManager[687]: <info>  [1681819283.4638] NetworkManager (version 1.42.0) is starting...",
+        "auth.log":
+          "Apr 18 12:00:01 debian-bitos sshd[1234]: Server listening on 0.0.0.0 port 22.\nApr 18 12:05:22 debian-bitos sudo:     user : TTY=pts/0 ; PWD=/home/user ; USER=root ; COMMAND=/usr/bin/apt update",
+        "dpkg.log":
+          "2023-04-18 12:10:05 status installed linux-image-5.15.0-bitos:amd64 5.15.0-1\n2023-04-18 12:10:10 status installed bash:amd64 5.2.15-2+b2\n2023-04-18 12:10:15 status installed coreutils:amd64 9.1-1",
+        apt: {
+          "history.log":
+            "Start-Date: 2023-04-18  12:10:00\nCommandline: apt install bash\nInstall: bash:amd64 (5.2.15-2+b2)\nEnd-Date: 2023-04-18  12:10:05",
+          "term.log":
+            "Log started: 2023-04-18  12:10:00\nReading package lists...\nBuilding dependency tree...\nReading state information...\nThe following packages will be upgraded:\n  bash\n1 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.\nNeed to get 1,564 kB of archives.\nAfter this operation, 0 B of additional disk space will be used.\nGet:1 http://deb.debian.org/debian bookworm/main amd64 bash amd64 5.2.15-2+b2 [1,564 kB]\nFetched 1,564 kB in 0s (3,128 kB/s)\nReading changelogs... Done\n(Reading database ... 132517 files and directories currently installed.)\nPreparing to unpack .../bash_5.2.15-2+b2_amd64.deb ...\nUnpacking bash (5.2.15-2+b2) over (5.2.15-2+b1) ...\nSetting up bash (5.2.15-2+b2) ...\nLog ended: 2023-04-18  12:10:05",
+        },
+      },
+      cache: {
+        apt: {
+          "pkgcache.bin": "Binary package cache file",
+          "srcpkgcache.bin": "Source package cache file",
+        },
       },
     },
     proc: {
@@ -48,7 +80,7 @@ export const fileSystem = {
       },
       sys: {
         kernel: {
-          hostname: "bitos",
+          hostname: "debian-bitos",
           version: "5.15.0-bitos",
           ostype: "Linux",
           osrelease: "5.15.0-bitos",
@@ -69,6 +101,22 @@ export const fileSystem = {
         },
       },
     },
+    usr: {
+      bin: {},
+      sbin: {},
+      share: {
+        doc: {
+          bash: {
+            copyright:
+              "This is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.",
+            changelog: "bash (5.2.15-2+b2) bookworm; urgency=medium\n\n  * Rebuild for bookworm.",
+          },
+        },
+        man: {},
+      },
+      lib: {},
+    },
+    tmp: {},
   },
 }
 
@@ -98,6 +146,8 @@ export const changeDirectory = (path: string) => {
     const targetDir = getDirectoryFromPath(path)
     if (targetDir) {
       currentPath = path
+      // Store current directory in localStorage for prompt
+      localStorage.setItem("currentDirectory", currentPath)
       return true
     }
     return false
@@ -107,14 +157,24 @@ export const changeDirectory = (path: string) => {
     if (pathParts.length > 0) {
       pathParts.pop()
       currentPath = "/" + pathParts.join("/")
+      // Store current directory in localStorage for prompt
+      localStorage.setItem("currentDirectory", currentPath)
       return true
     }
     return currentPath !== "/"
+  } else if (path === "~" || path === "$HOME") {
+    // Go to home directory
+    currentPath = "/home/user"
+    // Store current directory in localStorage for prompt
+    localStorage.setItem("currentDirectory", currentPath)
+    return true
   } else {
     // Relative path
     const currentDir = getCurrentDirectory()
     if (currentDir && currentDir[path]) {
       currentPath = currentPath === "/" ? `/${path}` : `${currentPath}/${path}`
+      // Store current directory in localStorage for prompt
+      localStorage.setItem("currentDirectory", currentPath)
       return true
     }
     return false
@@ -166,107 +226,176 @@ export const getFileContent = (path: string) => {
 
 // Main command executor
 export const executeCommand = async (input: string): Promise<string> => {
-  const [command, ...args] = input.trim().split(" ")
+  // Handle command with arguments
+  const args = input.trim().split(/\s+/)
+  const command = args[0].toLowerCase()
+  const commandArgs = args.slice(1)
 
-  // Basic command routing
-  switch (command.toLowerCase()) {
-    // File system commands
-    case "ls":
-    case "dir":
-      return fileSystemCommands.listDirectory(args[0])
-    case "cd":
-      return fileSystemCommands.changeDirectory(args[0] || "~")
-    case "pwd":
-      return fileSystemCommands.printWorkingDirectory()
-    case "cat":
-    case "type":
-      return fileSystemCommands.catFile(args[0])
-    case "mkdir":
-      return fileSystemCommands.makeDirectory(args[0])
-    case "touch":
-    case "new-item":
-      return fileSystemCommands.createFile(args[0], args.slice(1).join(" "))
+  // Special case for "about" command
+  if (command === "about") {
+    return `BitOS - Debian GNU/Linux Terminal Emulator
+Version: 1.0.0
+Created by: Taylor Christian Newsome
 
-    // Network commands
-    case "ping":
-      return await networkCommands.ping(args[0])
-    case "ifconfig":
-    case "ipconfig":
-      return networkCommands.ifconfig()
-    case "traceroute":
-    case "tracert":
-      return await networkCommands.traceroute(args[0])
-    case "netstat":
-      return networkCommands.netstat()
-    case "nslookup":
-    case "dig":
-      return await networkCommands.nslookup(args[0])
-    case "curl":
-    case "wget":
-      return await networkCommands.curl(args[0])
-    case "ss":
-      return networkCommands.socketStats()
-    case "route":
-      return networkCommands.routeTable()
+This is a browser-based terminal emulation that simulates a Debian Linux environment.
+It supports a wide range of standard Linux commands and utilities.
 
-    // System commands
-    case "uname":
-    case "ver":
-      return systemCommands.uname(args[0] === "-a")
-    case "ps":
-    case "tasklist":
-      return systemCommands.processList()
-    case "free":
-    case "mem":
-      return systemCommands.memoryUsage()
-    case "df":
-    case "diskspace":
-      return systemCommands.diskUsage()
-    case "uptime":
-      return systemCommands.uptime()
-    case "date":
-    case "time":
-      return systemCommands.dateTime()
-    case "clear":
-    case "cls":
-      return "\x1Bc"
+System Information:
+- Kernel: Linux 5.15.0-bitos
+- Distribution: Debian GNU/Linux 12 (Bookworm)
+- Architecture: x86_64
+- Memory: 16GB RAM
 
-    // Kernel debugging commands
-    case "dmesg":
-      return kernelCommands.dmesg(args)
-    case "sysctl":
-      return kernelCommands.sysctl(args)
-    case "lsmod":
-    case "modinfo":
-      return kernelCommands.lsmod(args[0])
-    case "strace":
-      return kernelCommands.strace(args)
-    case "lsof":
-      return kernelCommands.lsof(args)
-    case "vmstat":
-      return kernelCommands.vmstat()
-    case "iostat":
-      return kernelCommands.iostat()
-    case "top":
-      return systemCommands.top()
+Type 'help' for a list of available commands.`
+  }
 
-    // Help and misc
-    case "help":
-      return helpCommands.help(args[0])
-    case "man":
-      return helpCommands.manual(args[0])
-    case "echo":
-      return args.join(" ")
-    case "whoami":
-      return "user@bitos"
-    case "exit":
-    case "logout":
+  // Basic command routing by category
+  // File System Commands
+  if (
+    [
+      "ls",
+      "dir",
+      "cd",
+      "pwd",
+      "cat",
+      "type",
+      "mkdir",
+      "touch",
+      "rm",
+      "cp",
+      "mv",
+      "find",
+      "grep",
+      "chmod",
+      "chown",
+    ].includes(command)
+  ) {
+    return fileSystemCommands.executeFileCommand(command, commandArgs)
+  }
+
+  // Network Commands
+  else if (
+    [
+      "ping",
+      "ifconfig",
+      "ipconfig",
+      "traceroute",
+      "tracert",
+      "netstat",
+      "nslookup",
+      "dig",
+      "curl",
+      "wget",
+      "ss",
+      "route",
+      "ip",
+      "arp",
+      "host",
+    ].includes(command)
+  ) {
+    return await networkCommands.executeNetworkCommand(command, commandArgs)
+  }
+
+  // System Commands
+  else if (
+    [
+      "uname",
+      "ver",
+      "ps",
+      "tasklist",
+      "free",
+      "mem",
+      "df",
+      "diskspace",
+      "uptime",
+      "date",
+      "time",
+      "clear",
+      "cls",
+      "reboot",
+      "shutdown",
+    ].includes(command)
+  ) {
+    return systemCommands.executeSystemCommand(command, commandArgs)
+  }
+
+  // Kernel Debugging Commands
+  else if (
+    ["dmesg", "sysctl", "lsmod", "modinfo", "strace", "lsof", "vmstat", "iostat", "top", "htop"].includes(command)
+  ) {
+    return kernelCommands.executeKernelCommand(command, commandArgs)
+  }
+
+  // Package Management Commands
+  else if (["apt", "apt-get", "dpkg", "apt-cache"].includes(command)) {
+    return packageCommands.executePackageCommand(command, commandArgs)
+  }
+
+  // User Management Commands
+  else if (["whoami", "who", "w", "passwd", "adduser", "usermod", "groupadd", "su", "sudo"].includes(command)) {
+    return userCommands.executeUserCommand(command, commandArgs)
+  }
+
+  // Process Management Commands
+  else if (["kill", "killall", "nice", "renice", "bg", "fg", "jobs", "nohup"].includes(command)) {
+    return processCommands.executeProcessCommand(command, commandArgs)
+  }
+
+  // Utility Commands
+  else if (
+    [
+      "tar",
+      "gzip",
+      "gunzip",
+      "zip",
+      "unzip",
+      "ssh",
+      "scp",
+      "rsync",
+      "git",
+      "nano",
+      "vi",
+      "less",
+      "more",
+      "head",
+      "tail",
+      "sort",
+      "uniq",
+      "wc",
+      "cut",
+      "sed",
+      "awk",
+      "diff",
+      "cron",
+      "crontab",
+    ].includes(command)
+  ) {
+    return utilityCommands.executeUtilityCommand(command, commandArgs)
+  }
+
+  // Help and Documentation
+  else if (["help", "man", "info"].includes(command)) {
+    return helpCommands.executeHelpCommand(command, commandArgs)
+  }
+
+  // Shell Built-ins
+  else if (["echo", "printf", "history", "exit", "logout"].includes(command)) {
+    if (command === "echo") {
+      return commandArgs.join(" ")
+    } else if (command === "history") {
+      const history = JSON.parse(localStorage.getItem("commandHistory") || "[]")
+      return history.map((cmd: string, i: number) => `${i + 1}  ${cmd}`).join("\n")
+    } else if (command === "exit" || command === "logout") {
       return "Cannot exit terminal. This is a browser-based simulation."
+    }
+    return `${command}: command not fully implemented in this simulation.`
+  }
 
-    default:
-      if (command) {
-        return `Command not found: ${command}. Type 'help' for a list of available commands.`
-      }
-      return ""
+  // Command not found
+  else {
+    if (command) {
+      return `${command}: command not found. Type 'help' for a list of available commands.`
+    }
+    return ""
   }
 }
