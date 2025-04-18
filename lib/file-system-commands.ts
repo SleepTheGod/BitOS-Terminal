@@ -1,4 +1,49 @@
-import { getCurrentDirectory, getCurrentPath, getDirectoryFromPath, changeDirectory } from "./command-executor"
+import { getCurrentDirectory, getCurrentPath, getDirectoryFromPath } from "./command-executor"
+
+// Current working directory path
+let currentPath = "/home/user"
+
+// Change current directory
+export const changeDirectory = (path: string): boolean => {
+  if (path.startsWith("/")) {
+    // Absolute path
+    const targetDir = getDirectoryFromPath(path)
+    if (targetDir) {
+      currentPath = path
+      // Store current directory in localStorage for prompt
+      localStorage.setItem("currentDirectory", currentPath)
+      return true
+    }
+    return false
+  } else if (path === "..") {
+    // Go up one level
+    const pathParts = currentPath.split("/").filter(Boolean)
+    if (pathParts.length > 0) {
+      pathParts.pop()
+      currentPath = "/" + pathParts.join("/")
+      // Store current directory in localStorage for prompt
+      localStorage.setItem("currentDirectory", currentPath)
+      return true
+    }
+    return currentPath !== "/"
+  } else if (path === "~" || path === "$HOME") {
+    // Go to home directory
+    currentPath = "/home/user"
+    // Store current directory in localStorage for prompt
+    localStorage.setItem("currentDirectory", currentPath)
+    return true
+  } else {
+    // Relative path
+    const currentDir = getCurrentDirectory()
+    if (currentDir && currentDir[path]) {
+      currentPath = currentPath === "/" ? `/${path}` : `${currentPath}/${path}`
+      // Store current directory in localStorage for prompt
+      localStorage.setItem("currentDirectory", currentPath)
+      return true
+    }
+    return false
+  }
+}
 
 export const fileSystemCommands = {
   executeFileCommand: (command: string, args: string[]): string => {
@@ -34,6 +79,20 @@ export const fileSystemCommands = {
       default:
         return `${command}: command not found`
     }
+  },
+
+  // Change directory
+  changeDirectory: (path: string): string => {
+    if (!path) {
+      return ""
+    }
+
+    const success = changeDirectory(path)
+    if (!success) {
+      return `cd: ${path}: No such file or directory`
+    }
+
+    return ""
   },
 
   // List directory contents
@@ -96,20 +155,6 @@ export const fileSystemCommands = {
 
       return output.trim()
     }
-  },
-
-  // Change directory
-  changeDirectory: (path: string): string => {
-    if (!path) {
-      return ""
-    }
-
-    const success = changeDirectory(path)
-    if (!success) {
-      return `cd: ${path}: No such file or directory`
-    }
-
-    return ""
   },
 
   // Print working directory

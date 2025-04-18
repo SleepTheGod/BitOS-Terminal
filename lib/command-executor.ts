@@ -1,12 +1,12 @@
+import { fileSystemCommands } from "./file-system-commands"
 import { networkCommands } from "./network-commands"
 import { systemCommands } from "./system-commands"
-import { fileSystemCommands } from "./file-system-commands"
-import { helpCommands } from "./help-commands"
 import { kernelCommands } from "./kernel-commands"
 import { packageCommands } from "./package-commands"
 import { userCommands } from "./user-commands"
 import { processCommands } from "./process-commands"
 import { utilityCommands } from "./utility-commands"
+import { helpCommands } from "./help-commands"
 
 // Virtual file system structure
 export const fileSystem = {
@@ -121,7 +121,7 @@ export const fileSystem = {
 }
 
 // Current working directory path
-let currentPath = "/home/user"
+const currentPath = "/home/user"
 
 // Get current directory object from path
 export const getCurrentDirectory = () => {
@@ -137,48 +137,6 @@ export const getCurrentDirectory = () => {
   }
 
   return current
-}
-
-// Change current directory
-export const changeDirectory = (path: string) => {
-  if (path.startsWith("/")) {
-    // Absolute path
-    const targetDir = getDirectoryFromPath(path)
-    if (targetDir) {
-      currentPath = path
-      // Store current directory in localStorage for prompt
-      localStorage.setItem("currentDirectory", currentPath)
-      return true
-    }
-    return false
-  } else if (path === "..") {
-    // Go up one level
-    const pathParts = currentPath.split("/").filter(Boolean)
-    if (pathParts.length > 0) {
-      pathParts.pop()
-      currentPath = "/" + pathParts.join("/")
-      // Store current directory in localStorage for prompt
-      localStorage.setItem("currentDirectory", currentPath)
-      return true
-    }
-    return currentPath !== "/"
-  } else if (path === "~" || path === "$HOME") {
-    // Go to home directory
-    currentPath = "/home/user"
-    // Store current directory in localStorage for prompt
-    localStorage.setItem("currentDirectory", currentPath)
-    return true
-  } else {
-    // Relative path
-    const currentDir = getCurrentDirectory()
-    if (currentDir && currentDir[path]) {
-      currentPath = currentPath === "/" ? `/${path}` : `${currentPath}/${path}`
-      // Store current directory in localStorage for prompt
-      localStorage.setItem("currentDirectory", currentPath)
-      return true
-    }
-    return false
-  }
 }
 
 // Get directory object from path
@@ -226,7 +184,44 @@ export const getFileContent = (path: string) => {
 
 // Main command executor
 export const executeCommand = async (input: string): Promise<string> => {
-  // Handle command with arguments
+  // Handle command chaining with semicolons
+  if (input.includes(";")) {
+    const commands = input
+      .split(";")
+      .map((cmd) => cmd.trim())
+      .filter(Boolean)
+    let output = ""
+
+    for (let i = 0; i < commands.length; i++) {
+      const cmdOutput = await executeSingleCommand(commands[i])
+      output += cmdOutput
+      if (i < commands.length - 1) {
+        output += "\n"
+      }
+    }
+
+    return output
+  }
+
+  // Handle command piping with |
+  if (input.includes("|")) {
+    // For simplicity, we'll just execute the first command
+    // In a real terminal, the output would be piped to the next command
+    const firstCommand = input.split("|")[0].trim()
+    return (await executeSingleCommand(firstCommand)) + "\n(Note: Command piping is simulated)"
+  }
+
+  // Handle sudo commands
+  if (input.startsWith("sudo ")) {
+    const sudoArgs = input.slice(5).trim().split(/\s+/)
+    return userCommands.executeUserCommand("sudo", sudoArgs)
+  }
+
+  return await executeSingleCommand(input)
+}
+
+// Execute a single command
+async function executeSingleCommand(input: string): Promise<string> {
   const args = input.trim().split(/\s+/)
   const command = args[0].toLowerCase()
   const commandArgs = args.slice(1)

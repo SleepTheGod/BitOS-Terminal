@@ -4,6 +4,36 @@
 const systemStartTime = new Date()
 
 export const systemCommands = {
+  executeSystemCommand: (command: string, args: string[]): string => {
+    switch (command) {
+      case "uname":
+      case "ver":
+        return systemCommands.uname(args.includes("-a") || args.includes("--all"))
+      case "ps":
+      case "tasklist":
+        return systemCommands.processList()
+      case "free":
+      case "mem":
+        return systemCommands.memoryUsage()
+      case "df":
+      case "diskspace":
+        return systemCommands.diskUsage()
+      case "uptime":
+        return systemCommands.uptime()
+      case "date":
+      case "time":
+        return systemCommands.dateTime()
+      case "clear":
+      case "cls":
+        return "\x1Bc" // ANSI escape code to clear screen
+      case "reboot":
+      case "shutdown":
+        return "Cannot reboot/shutdown. This is a browser-based simulation."
+      default:
+        return `${command}: command not found`
+    }
+  },
+
   // Simulate uname command
   uname: (all: boolean): string => {
     if (all) {

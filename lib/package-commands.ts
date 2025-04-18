@@ -73,7 +73,28 @@ Calculating upgrade... Done
       }
 
       const packageName = args[1]
-      return `Reading package lists... Done
+
+      // Check if sudo is used
+      if (!args.includes("--assume-yes") && !args.includes("-y")) {
+        return `Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following NEW packages will be installed:
+  ${packageName}
+0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+Need to get 1,564 kB of archives.
+After this operation, 5,192 kB of additional disk space will be used.
+Do you want to continue? [Y/n] y
+Get:1 http://deb.debian.org/debian bookworm/main amd64 ${packageName} amd64 1.2.3-1 [1,564 kB]
+Fetched 1,564 kB in 0s (3,128 kB/s)
+Selecting previously unselected package ${packageName}.
+(Reading database ... 132517 files and directories currently installed.)
+Preparing to unpack .../archives/${packageName}_1.2.3-1_amd64.deb ...
+Unpacking ${packageName} (1.2.3-1) ...
+Setting up ${packageName} (1.2.3-1) ...
+Processing triggers for man-db (2.11.2-2) ...`
+      } else {
+        return `Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
 The following NEW packages will be installed:
@@ -89,6 +110,7 @@ Preparing to unpack .../archives/${packageName}_1.2.3-1_amd64.deb ...
 Unpacking ${packageName} (1.2.3-1) ...
 Setting up ${packageName} (1.2.3-1) ...
 Processing triggers for man-db (2.11.2-2) ...`
+      }
     }
 
     if (subcommand === "remove") {
@@ -341,7 +363,16 @@ lib${searchTerm} - ${searchTerm} library package
   This package provides the shared libraries for ${searchTerm}
 
 ${searchTerm}-utils - ${searchTerm} utilities package
-  This package contains utilities for working with ${searchTerm}`
+  This package contains utilities for working with ${searchTerm}
+
+python3-${searchTerm} - Python 3 bindings for ${searchTerm}
+  This package provides Python 3 bindings for ${searchTerm}
+
+${searchTerm}-dev - Development files for ${searchTerm}
+  This package contains the header files and static libraries for ${searchTerm}
+
+${searchTerm}-doc - Documentation for ${searchTerm}
+  This package contains the documentation for ${searchTerm}`
     }
 
     if (subcommand === "show") {

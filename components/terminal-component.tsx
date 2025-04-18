@@ -65,7 +65,7 @@ export default function TerminalComponent() {
         // Set up the prompt in Debian style
         const getPrompt = () => {
           const username = "user"
-          const hostname = "debian-bitos"
+          const hostname = "BitOS"
           const currentPath = getCurrentDirectory()
           // Simplified path display like in real terminals
           const displayPath = currentPath === "/home/user" ? "~" : currentPath.replace("/home/user", "~")
@@ -246,6 +246,8 @@ export default function TerminalComponent() {
             "vmstat",
             "iostat",
             "apt",
+            "apt-get",
+            "apt-cache",
             "dpkg",
             "systemctl",
             "journalctl",

@@ -1,3 +1,5 @@
+import { packageCommands } from "./package-commands"
+
 export const userCommands = {
   executeUserCommand: (command: string, args: string[]): string => {
     switch (command) {
@@ -155,6 +157,28 @@ Try 'usermod --help' for more information.`
       return "usage: sudo -h | -K | -k | -V\nusage: sudo -v [-ABknS] [-g group] [-h host] [-p prompt] [-u user]\nusage: sudo -l [-ABknS] [-g group] [-h host] [-p prompt] [-U user] [-u user] [command]\nusage: sudo [-ABbEHknPS] [-C num] [-D directory] [-g group] [-h host] [-p prompt] [-R directory] [-T timeout] [-u user] [VAR=value] [-i|-s] [<command>]\nusage: sudo -e [-ABknS] [-C num] [-D directory] [-g group] [-h host] [-p prompt] [-R directory] [-T timeout] [-u user] file ..."
     }
 
-    return "[sudo] password for user: \nuser is not in the sudoers file. This incident will be reported."
+    // For demonstration, let's simulate sudo working for apt commands
+    if (args[0] === "apt" || args[0] === "apt-get") {
+      const aptArgs = args.slice(1)
+      return packageCommands.apt(aptArgs)
+    }
+
+    if (args[0] === "dpkg") {
+      const dpkgArgs = args.slice(1)
+      return packageCommands.dpkg(dpkgArgs)
+    }
+
+    if (args[0] === "apt-cache") {
+      const aptCacheArgs = args.slice(1)
+      return packageCommands.aptCache(aptCacheArgs)
+    }
+
+    // For other commands, simulate sudo execution
+    if (args[0] === "-i") {
+      return "root@BitOS:~# "
+    }
+
+    return `[sudo] password for user: 
+${args.join(" ")}`
   },
 }
