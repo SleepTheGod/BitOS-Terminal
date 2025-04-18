@@ -35,6 +35,10 @@ export default function TerminalComponent() {
           lineHeight: 1.2,
           scrollback: 1000,
           allowTransparency: true,
+          cols: 80,
+          rows: 24,
+          convertEol: true,
+          wordBreak: true,
         })
 
         fitAddon = new FitAddon()
@@ -189,7 +193,26 @@ export default function TerminalComponent() {
               } else if (availableCommands.length > 1) {
                 // If there are multiple matches, show them
                 term.write("\r\n")
-                term.writeln(availableCommands.join("  "))
+
+                // Format the available commands to fit the terminal width
+                const termWidth = term.cols
+                let line = ""
+                const formattedCommands = []
+
+                for (const cmd of availableCommands) {
+                  if (line.length + cmd.length + 2 > termWidth) {
+                    formattedCommands.push(line)
+                    line = cmd + "  "
+                  } else {
+                    line += cmd + "  "
+                  }
+                }
+
+                if (line) {
+                  formattedCommands.push(line)
+                }
+
+                term.writeln(formattedCommands.join("\r\n"))
                 const currentPrompt = getPrompt()
                 term.write(currentPrompt + currentLine)
               }
@@ -329,7 +352,20 @@ export default function TerminalComponent() {
             if (output === "\x1Bc") {
               term.clear()
             } else if (output.trim()) {
-              term.writeln(output)
+              // Process output to ensure it fits within terminal width
+              const termWidth = term.cols
+              const lines = output.split("\n")
+
+              for (const line of lines) {
+                // For very long lines without spaces, add breaks
+                if (line.length > termWidth && !line.includes(" ")) {
+                  for (let i = 0; i < line.length; i += termWidth) {
+                    term.writeln(line.substring(i, i + termWidth))
+                  }
+                } else {
+                  term.writeln(line)
+                }
+              }
             }
 
             const newPrompt = getPrompt()
