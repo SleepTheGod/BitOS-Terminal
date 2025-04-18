@@ -113,9 +113,11 @@ export const networkCommands = {
     }
 
     // Otherwise show all interfaces
-    interfaces.forEach((iface) => {
+    interfaces.forEach((iface, index) => {
       output += formatInterface(iface)
-      output += "\n"
+      if (index < interfaces.length - 1) {
+        output += "\n"
+      }
     })
 
     return output
@@ -145,10 +147,10 @@ export const networkCommands = {
       // Last hop is the destination
       const hopName = i === hops ? host : `router-${i}.example.com`
 
-      output += `${i}  ${hopName} (${ip})  ${time1} ms  ${time2} ms  ${time3} ms\n`
+      output += ` ${i.toString().padStart(2)}  ${hopName} (${ip})  ${time1} ms  ${time2} ms  ${time3} ms\n`
     }
 
-    return output
+    return output.trim()
   },
 
   // Simulate netstat command
@@ -209,16 +211,17 @@ export const networkCommands = {
             : generateRandomIp()
       const foreignPort = state === "LISTEN" ? "*" : Math.floor(Math.random() * 60000 + 1024)
 
+      const localAddr = `${localIp}:${localPort}`
+      const foreignAddr = `${foreignIp}:${foreignPort}`
+
       output += `${proto.padEnd(6)} ${Math.floor(Math.random() * 10)
         .toString()
         .padEnd(7)} ${Math.floor(Math.random() * 10)
         .toString()
-        .padEnd(
-          7,
-        )} ${localIp}:${localPort.toString().padEnd(5)} ${foreignIp}:${foreignPort.toString().padEnd(5)} ${state}\n`
+        .padEnd(7)} ${localAddr.padEnd(23)} ${foreignAddr.padEnd(23)} ${state}\n`
     }
 
-    return output
+    return output.trim()
   },
 
   // Simulate nslookup/dig command
@@ -431,16 +434,17 @@ export const networkCommands = {
         ? `users:(("nginx",pid=${Math.floor(Math.random() * 10000)},fd=${Math.floor(Math.random() * 20)}))`
         : ""
 
+      const localAddr = `${localIp}:${localPort}`
+      const peerAddr = `${peerIp}:${peerPort}`
+
       output += `${netid.padEnd(6)} ${state.padEnd(11)} ${Math.floor(Math.random() * 10)
         .toString()
         .padEnd(7)} ${Math.floor(Math.random() * 10)
         .toString()
-        .padEnd(
-          7,
-        )} ${localIp}:${localPort.toString().padEnd(5)} ${peerIp}:${peerPort.toString().padEnd(5)} ${process}\n`
+        .padEnd(7)} ${localAddr.padEnd(23)} ${peerAddr.padEnd(23)} ${process}\n`
     }
 
-    return output
+    return output.trim()
   },
 
   // Simulate route command
@@ -557,7 +561,11 @@ function generateRandomIp(): string {
 function generateRandomIpv6(): string {
   const segments = []
   for (let i = 0; i < 8; i++) {
-    segments.push(Math.floor(Math.random() * 65535).toString(16))
+    segments.push(
+      Math.floor(Math.random() * 65535)
+        .toString(16)
+        .padStart(4, "0"),
+    )
   }
   return segments.join(":")
 }
@@ -582,7 +590,7 @@ function formatInterface(iface: any): string {
     output += `        ether ${iface.mac}  txqueuelen 1000  (Ethernet)\n`
   }
   output += `        RX packets ${Math.floor(iface.rx / 1000)}  bytes ${iface.rx} (${(iface.rx / 1024 / 1024).toFixed(2)} MiB)\n`
-  output += `        TX packets ${Math.floor(iface.tx / 1000)}  bytes ${iface.tx} (${(iface.tx / 1024 / 1024).toFixed(2)} MiB)\n`
+  output += `        TX packets ${Math.floor(iface.tx / 1000)}  bytes ${iface.tx} (${(iface.tx / 1024 / 1024).toFixed(2)} MiB)`
 
   return output
 }

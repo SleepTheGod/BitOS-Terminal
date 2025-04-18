@@ -177,13 +177,13 @@ export const systemCommands = {
       },
     ]
 
-    let output = "PID   USER     %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND\n"
+    let output = "  PID USER     %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND\n"
 
     processes.forEach((proc) => {
-      output += `${proc.pid.toString().padEnd(6)} ${proc.user.padEnd(9)} ${proc.cpu.toFixed(1).padEnd(5)} ${proc.mem.toFixed(1).padEnd(5)} ${proc.vsz.toString().padEnd(7)} ${proc.rss.toString().padEnd(5)} ${proc.tty.padEnd(8)} ${proc.stat.padEnd(4)} ${proc.start.padEnd(7)} ${proc.time.padEnd(5)} ${proc.command}\n`
+      output += `${proc.pid.toString().padStart(5)} ${proc.user.padEnd(8)} ${proc.cpu.toFixed(1).padEnd(5)} ${proc.mem.toFixed(1).padEnd(5)} ${proc.vsz.toString().padEnd(7)} ${proc.rss.toString().padEnd(5)} ${proc.tty.padEnd(8)} ${proc.stat.padEnd(4)} ${proc.start.padEnd(7)} ${proc.time.padEnd(5)} ${proc.command}\n`
     })
 
-    return output
+    return output.trim()
   },
 
   // Simulate free/mem command
@@ -196,8 +196,10 @@ export const systemCommands = {
     const cached = Math.floor(Math.random() * 2048) + 2048
 
     let output = "              total        used        free      shared  buff/cache   available\n"
-    output += `Mem:          ${total}       ${used}       ${free}        ${shared}       ${buffers + cached}       ${free + buffers + cached}\n`
-    output += `Swap:         ${total / 2}          ${Math.floor(Math.random() * 1024)}       ${total / 2 - Math.floor(Math.random() * 1024)}\n`
+    output += `Mem:          ${total.toString().padStart(7)}     ${used.toString().padStart(7)}     ${free.toString().padStart(7)}     ${shared.toString().padStart(7)}     ${(buffers + cached).toString().padStart(7)}     ${(free + buffers + cached).toString().padStart(7)}\n`
+    output += `Swap:         ${(total / 2).toString().padStart(7)}          ${Math.floor(Math.random() * 1024)
+      .toString()
+      .padStart(7)}     ${(total / 2 - Math.floor(Math.random() * 1024)).toString().padStart(7)}`
 
     return output
   },
@@ -233,7 +235,7 @@ export const systemCommands = {
       output += `${fs.fs.padEnd(15)} ${fs.type.padEnd(10)} ${formatSize(fs.size).padEnd(6)} ${formatSize(fs.used).padEnd(6)} ${formatSize(fs.avail).padEnd(6)} ${fs.use.toString().padEnd(3)}% ${fs.mountpoint}\n`
     })
 
-    return output
+    return output.trim()
   },
 
   // Simulate uptime command

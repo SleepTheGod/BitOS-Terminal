@@ -32,6 +32,9 @@ export default function TerminalComponent() {
           },
           fontFamily: 'Menlo, Monaco, "Courier New", monospace',
           fontSize: 14,
+          lineHeight: 1.2,
+          scrollback: 1000,
+          allowTransparency: true,
         })
 
         fitAddon = new FitAddon()
@@ -325,7 +328,7 @@ export default function TerminalComponent() {
             // Handle special case for clear command
             if (output === "\x1Bc") {
               term.clear()
-            } else {
+            } else if (output.trim()) {
               term.writeln(output)
             }
 

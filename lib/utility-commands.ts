@@ -52,7 +52,7 @@ export const utilityCommands = {
   // Simulate tar command
   tar: (args: string[]): string => {
     if (args.length === 0) {
-      return "Usage: tar [options] [file]..."
+      return "Usage: tar [OPTION...] [FILE]...\nTry 'tar --help' or 'tar --usage' for more information."
     }
 
     const option = args[0]
@@ -74,31 +74,31 @@ export const utilityCommands = {
   // Simulate gzip/gunzip command
   gzip: (args: string[]): string => {
     if (args.length === 0) {
-      return "Usage: gzip [options] [file]..."
+      return "Usage: gzip [OPTION]... [FILE]...\nTry 'gzip --help' for more information."
     }
 
     const filename = args[args.length - 1]
     if (args[0] === "-d" || args[0] === "--decompress") {
-      return ""
+      return `gzip: ${filename}: No such file or directory`
     }
 
-    return ""
+    return `gzip: ${filename}: No such file or directory`
   },
 
   // Simulate zip/unzip command
   zip: (args: string[]): string => {
     if (args.length < 2) {
-      return "Usage: zip [options] zipfile files..."
+      return "Usage: zip [-options] zipfile files\n       unzip [-options] zipfile"
     }
 
     const zipfile = args[0]
     const files = args.slice(1)
 
     if (args[0] === "-r") {
-      return `adding: ${args[2]}/ (stored 0%)\nadding: ${args[2]}/file1.txt (deflated 50%)\nadding: ${args[2]}/file2.txt (deflated 50%)`
+      return `  adding: ${args[2]}/        (stored 0%)\n  adding: ${args[2]}/file1.txt        (deflated 50%)\n  adding: ${args[2]}/file2.txt        (deflated 50%)`
     }
 
-    return `adding: ${files[0]} (deflated 50%)`
+    return `  adding: ${files[0]}        (deflated 50%)`
   },
 
   // Simulate ssh command
@@ -142,11 +142,11 @@ export const utilityCommands = {
     const subcommand = args[0]
 
     if (subcommand === "init") {
-      return `Initialized empty Git repository in ${process.cwd()}/.git/`
+      return `Initialized empty Git repository in ${getCurrentPath()}/.git/`
     }
 
     if (subcommand === "status") {
-      return `On branch main\nNo commits yet\nnothing to commit (create/copy files and use "git add" to track)`
+      return `On branch main\n\nNo commits yet\n\nnothing to commit (create/copy files and use "git add" to track)`
     }
 
     if (subcommand === "clone") {
@@ -208,7 +208,7 @@ export const utilityCommands = {
     }
 
     if (subcommand === "log") {
-      return `commit ${generateRandomCommitHash()} (HEAD -> main)\nAuthor: User <user@example.com>\nDate:   ${new Date().toUTCString()}\n\n   Initial commit`
+      return `commit ${generateRandomCommitHash()} (HEAD -> main)\nAuthor: User <user@example.com>\nDate:   ${new Date().toUTCString()}\n\n    Initial commit`
     }
 
     return `git: '${subcommand}' is not a git command. See 'git --help'.`
@@ -237,7 +237,7 @@ export const utilityCommands = {
   // Simulate head command
   head: (args: string[]): string => {
     if (args.length === 0) {
-      return "Usage: head [options] [file]..."
+      return "Usage: head [OPTION]... [FILE]...\nPrint the first 10 lines of each FILE to standard output.\nWith more than one FILE, precede each with a header giving the file name."
     }
 
     let lines = 10
@@ -262,7 +262,7 @@ export const utilityCommands = {
   // Simulate tail command
   tail: (args: string[]): string => {
     if (args.length === 0) {
-      return "Usage: tail [options] [file]..."
+      return "Usage: tail [OPTION]... [FILE]...\nPrint the last 10 lines of each FILE to standard output.\nWith more than one FILE, precede each with a header giving the file name."
     }
 
     let lines = 10
@@ -290,7 +290,7 @@ export const utilityCommands = {
   // Simulate sort command
   sort: (args: string[]): string => {
     if (args.length === 0) {
-      return "Usage: sort [options] [file]..."
+      return "Usage: sort [OPTION]... [FILE]...\nWrite sorted concatenation of all FILE(s) to standard output."
     }
 
     const filename = args[args.length - 1]
@@ -300,7 +300,7 @@ export const utilityCommands = {
   // Simulate uniq command
   uniq: (args: string[]): string => {
     if (args.length === 0) {
-      return "Usage: uniq [options] [input [output]]"
+      return "Usage: uniq [OPTION]... [INPUT [OUTPUT]]\nFilter adjacent matching lines from INPUT (or standard input),\nwriting to OUTPUT (or standard output)."
     }
 
     const filename = args[args.length - 1]
@@ -310,7 +310,7 @@ export const utilityCommands = {
   // Simulate wc command
   wc: (args: string[]): string => {
     if (args.length === 0) {
-      return "Usage: wc [options] [file]..."
+      return "Usage: wc [OPTION]... [FILE]...\nPrint newline, word, and byte counts for each FILE, and a total line if\nmore than one FILE is specified."
     }
 
     const filename = args[args.length - 1]
@@ -320,7 +320,7 @@ export const utilityCommands = {
   // Simulate cut command
   cut: (args: string[]): string => {
     if (args.length === 0) {
-      return "Usage: cut [options] [file]..."
+      return "Usage: cut OPTION... [FILE]...\nPrint selected parts of lines from each FILE to standard output."
     }
 
     if (!args.includes("-d") || !args.includes("-f")) {
@@ -334,7 +334,7 @@ export const utilityCommands = {
   // Simulate sed command
   sed: (args: string[]): string => {
     if (args.length < 2) {
-      return "Usage: sed [options] {script} [input-file]..."
+      return "Usage: sed [OPTION]... {script-only-if-no-other-script} [input-file]...\nRun sed commands on input files, sending output to stdout."
     }
 
     const script = args[0]
@@ -345,7 +345,7 @@ export const utilityCommands = {
   // Simulate awk command
   awk: (args: string[]): string => {
     if (args.length < 2) {
-      return "Usage: awk [options] 'program' file ..."
+      return "Usage: awk [POSIX or GNU style options] -f progfile [--] file ...\nUsage: awk [POSIX or GNU style options] [--] 'program' file ..."
     }
 
     const program = args[0]
@@ -356,7 +356,7 @@ export const utilityCommands = {
   // Simulate diff command
   diff: (args: string[]): string => {
     if (args.length < 2) {
-      return "Usage: diff [options] from-file to-file"
+      return "Usage: diff [OPTION]... FILES\nCompare FILES line by line."
     }
 
     const file1 = args[0]
@@ -383,7 +383,7 @@ export const utilityCommands = {
       return "no crontab for user"
     }
 
-    return "crontab: invalid option -- 'option'"
+    return `crontab: invalid option -- '${option}'`
   },
 }
 
@@ -395,4 +395,9 @@ function generateRandomCommitHash(): string {
     hash += characters.charAt(Math.floor(Math.random() * characters.length))
   }
   return hash
+}
+
+// Helper function to get current path
+function getCurrentPath(): string {
+  return localStorage.getItem("currentDirectory") || "/home/user"
 }
