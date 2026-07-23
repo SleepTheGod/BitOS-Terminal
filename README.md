@@ -14,7 +14,7 @@ Any changes you make to your deployed app will be automatically pushed to this r
 
 Your project is live at:
 
-**[https://bitos.vercel.app](https://bitos.vercel.app))**
+**[https://bitos.vercel.app](https://bitos.vercel.app)**
 
 ## Build your app
 
